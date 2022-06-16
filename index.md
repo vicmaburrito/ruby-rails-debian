@@ -1,37 +1,137 @@
-## Welcome to GitHub Pages
+# To Install VM and Debian 11 distribution:
 
-You can use the [editor on GitHub](https://github.com/vicmaburrito/ruby-rails-debian/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+## [Click Here](https://www.youtube.com/watch?v=6PTjoSBdjok&t=132s&ab_channel=FacultadAutodidacta)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## To install sudo on Debian
 
-### Markdown
+```bash
+ $ su
+ $ apt-get install sudo
+ $ nano /etc/sudoers
+```
+* Below of ```%sudo   ALL=(ALL:ALL) ALL``` : 
+  ```bash
+  yourUsername ALL=(ALL:ALL) ALL
+  ```
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* Then run
+  ```bash
+  sudo apt-get update 
+  sudo apt-get upgrade
+  ```
 
-```markdown
-Syntax highlighted code block
+# Debian Swap
 
-# Header 1
-## Header 2
-### Header 3
+* 1 : ``` $ cat /proc/sys/vm/swappiness```
+* 2 : ``` $ sudo nano /etc/sysctl.conf```
+  - On nano editor, go to the bottom of the page and add ```vm.swappiness=10```
+* 3 : Reboot your system and run again the first command
 
-- Bulleted
-- List
+# Installing Ruby 
 
-1. Numbered
-2. List
+## First, we need to make sure your Linux distribution is up to date
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```
+  sudo apt update
+  sudo apt upgrade
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+## Install Packages and Libraries
+```bash
+$ sudo apt install gcc make libssl-dev libreadline-dev zlib1g-dev libsqlite3-dev
+```
 
-### Jekyll Themes
+### if you don't have git, just run:
+```bash
+$ sudo apt install git
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/vicmaburrito/ruby-rails-debian/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Install rbenv
+```bash
+$ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+$ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+$ echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+$ exit
+```
 
-### Support or Contact
+### Install ruby-build
+```bash
+$ mkdir -p "$(rbenv root)"/plugins
+$ git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
+```
+### Run:
+```bash
+$ rbenv -v
+# Output: rbenv 1.2.0-14-xxxxx
+```
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## Install Ruby
+```bash
+  $ rbenv install 2.7.4 --verbose
+```
+  * Then
+  ```bash
+   $ rbenv global 2.7.4
+   $ ruby -v 
+   # Output: 
+   # ruby 2.7.4pxxx (xxxx revision xxxxx)[x86_64-linux]
+   ```
+
+# Install Rails
+```bash
+ $ gem install rails -v 6.0.4.8
+ $ rails -v
+ # Output:
+ # Rails 6.0.4.8
+```
+ 
+# Installing MariaDB 
+
+## Install MariaDB
+```bash
+sudo apt install mariadb-server 
+```
+
+## Configure MariaDB on Debian
+```bash
+sudo mysql_secure_installation 
+```
+
+* Then 
+   - Switch to unix_socket authentication [Y/N] n
+   - Change the root password? [Y/N] n
+   - Remove anonymus users? [Y/N] y
+   - Disallow root login remotely? [Y/N] y
+   - Remove test database and access to it? [Y/N] y
+   - Reload privilege tables now? [Y/N] y
+
+## Create Privileges User with Authentication
+```bash
+$ sudo mysql
+```
+```sql
+- CREATE USER 'yourUsername'@'localhost' IDENTIFIED BY '_pa$$w0rd_';
+- GRANT ALL ON *.* TO 'yourUsername'@'localhost' WITH GRANT OPTION;
+- FLUSH PRIVILEGES;  
+- EXIT
+```
+## To test the status of MariaDB
+```bash
+$ sudo systemctl status mariadb
+$ sudo systemctl start mariadb 
+```
+
+
+
+If you already have a mysql installed on your local environment maybe you will find a troubles like this: 
+```bash
+“ERROR 2002 (HY000): Can’t connect to local MySQL server through socket ‘/var/run/mysqld/mysqld.sock’ (2)”
+```
+We will remove mysql with the following commands
+```bash
+$ sudo apt-get remove --purge mysql-server mysql-client $ mysql-common -y
+$ sudo apt-get autoremove -y
+$ sudo apt-get autoclean
+$ sudo rm -rf /etc/mysql
+$ sudo find / -iname 'mysql*' -exec rm -rf {} \;
+```
